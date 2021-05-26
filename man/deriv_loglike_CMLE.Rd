@@ -5,15 +5,15 @@
 \title{Derivative of the Log likelihood function for the conditional
 maximum likelihood estimation}
 \usage{
-deriv_loglike_CMLE(A, gamma)
+deriv_loglike_CMLE(gamma, A)
 }
 \arguments{
-\item{A}{(n-by-n-by-T array) time series of the adjacency matrices}
-
 \item{gamma}{The autoregressive parameter}
+
+\item{A}{(n-by-n-by-T array) time series of the adjacency matrices}
 }
 \value{
-derivative of the log-likelihood
+derivative of the log-likelihood (times -1)
 }
 \description{
 Derivative of the Log likelihood function for the conditional

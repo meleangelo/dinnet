@@ -4,15 +4,15 @@
 \alias{loglike_CMLE}
 \title{Log likelihood function for the conditional maximum likelihood estimation}
 \usage{
-loglike_CMLE(A, gamma)
+loglike_CMLE(gamma, A)
 }
 \arguments{
-\item{A}{(n-by-n-by-T array) time series of the adjacency matrices}
-
 \item{gamma}{The autoregressive parameter}
+
+\item{A}{(n-by-n-by-T array) time series of the adjacency matrices}
 }
 \value{
-log-likelihood
+log-likelihood (times -1)
 }
 \description{
 Log likelihood function for the conditional maximum likelihood estimation
