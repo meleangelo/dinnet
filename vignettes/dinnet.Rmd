@@ -1,0 +1,21 @@
+---
+title: "dinnet"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{dinnet}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+Start here...
+
+```{r setup}
+library(dinnet)
+```
