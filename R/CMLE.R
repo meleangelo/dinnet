@@ -101,7 +101,7 @@ CMLE_est <- function(A, gamma_init = NULL) {
   if(is.null(gamma_init)) gamma_init <- 0.5
 
   opts <- list("algorithm" = "NLOPT_LD_LBFGS",
-               "xtol_rel" = 1.0e-6)
+               "xtol_rel" = 1.0e-5)
 
   opt_fit <- nloptr::nloptr(x0 = gamma_init,
                             eval_f = loglike_CMLE,
