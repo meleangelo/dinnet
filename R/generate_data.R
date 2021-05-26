@@ -31,7 +31,7 @@ generate_latent_posSBM <- function(latent, d, block_size){
   K <- length(block_size)
 
   # Compute the latent position (n-by-d matrix)
-  latent_positions <- t(latent[1:d, rep(seq.int(1, K), block_size)])
+  latent_positions <- t(latent[, rep(seq.int(1, K), block_size), drop = FALSE])
   return(latent_positions)
 }
 
@@ -79,7 +79,7 @@ generate_data <- function(latent_positions, gamma, time_periods, sim){
 
   # generate initial adjacency A_0
   A0 <- 1 * (matrix(runif(n^2), ncol = n, nrow = n) < P0)
-  A0[lower.tri(A0)] <- t(A0)[lower.tri(t(A0))]
+  A0[lower.tri(A0)] <- t(A0)[lower.tri(t(A0))] # ensure A_0 is symmetric
   diag(A0) <- 0
 
   # initialize P and A

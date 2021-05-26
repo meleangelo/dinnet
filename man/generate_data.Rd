@@ -22,7 +22,7 @@ A list containing the following:
 \item{`P0`}{(n-by-n matrix) Initial transition probability matrix \eqn{P_0}}
 \item{`A`}{(n-by-n-by-T array) time series of the adjacency matrices}
 \item{`P`}{(n-by-n-by-T array) time series of the transition probability matrix}
-\item{`alpha`}{(n-by-n matrix) \eqn{a_i^T a_j}}
+\item{`alpha`}{(n-by-n matrix) the product of latent positions \eqn{a_i^T a_j}}
 }
 }
 \description{

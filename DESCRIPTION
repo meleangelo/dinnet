@@ -9,10 +9,12 @@ Authors@R: c(
 Description: More about what it does (maybe more than one line)
     Use four spaces when indenting paragraphs within the Description.
 Imports:
-    RSpectra,
-    irlba,
     grdpg,
-    mclust
+    irlba,
+    Matrix,
+    mclust,
+    nloptr,
+    RSpectra
 Suggests:
     CVXR
 License: MIT + file LICENSE
