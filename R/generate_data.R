@@ -35,8 +35,6 @@ generate_latent_posSBM <- function(latent, d, block_size){
   return(latent_positions)
 }
 
-
-
 #' Function to generate the network time series
 #'
 #' The function generates the (stationary) time series of the networks
@@ -44,6 +42,7 @@ generate_latent_posSBM <- function(latent, d, block_size){
 #'
 #'
 #' @importFrom grdpg sigmoid
+#' @import Matrix
 #'
 #' @section Warning: random seeds changed
 #'
@@ -78,25 +77,44 @@ generate_data <- function(latent_positions, gamma, time_periods, sim){
   P0 <- sigmoid(alpha) / (1 - sigmoid(gamma + alpha) + sigmoid(alpha))
 
   # generate initial adjacency A_0
-  A0 <- 1 * (matrix(runif(n^2), ncol = n, nrow = n) < P0)
-  A0[lower.tri(A0)] <- t(A0)[lower.tri(t(A0))] # ensure A_0 is symmetric
-  diag(A0) <- 0
+  A0 <- sym_mat(
+    1 * (matrix(runif(n^2), ncol = n, nrow = n) < P0)
+  )
 
   # initialize P and A
   P <- array(NA, dim = c(n, n, time_periods))
   A <- array(NA, dim = c(n, n, time_periods))
 
   P[, , 1] <- sigmoid(gamma * A0 + alpha)
-  A[, , 1] <- 1 * (matrix(runif(n ^ 2), ncol = n, nrow = n) < P[, , 1])
-  diag(A[, , 1]) <- 0
+  A[, , 1] <- sym_mat(
+    1 * (matrix(runif(n ^ 2), ncol = n, nrow = n) < P[, , 1])
+  )
 
   for (t in 2:time_periods) {
     t1 <- t - 1
     P[, , t] <- sigmoid(gamma * A[, , t1] + alpha)
-    A[, , t] <- 1 * (matrix(runif(n ^ 2), ncol = n, nrow = n) < P[, , t])
-    diag(A[, , t]) <- 0
+    A[, , t] <- sym_mat(
+      1 * (matrix(runif(n ^ 2), ncol = n, nrow = n) < P[, , t])
+    )
   }
+
   data <- list(A0, P0, A, P, alpha)
   names(data) <- c("A0", "P0", "A", "P", "alpha")
   return(data)
+}
+
+
+#' Convert a matrix to a symmetric matrix
+#'
+#' Assign the upper triangular matrix to the lower triangle and let diagonal = 0
+#'
+#' @param A a square matrix
+#'
+#' @return `A_sym`
+#'
+sym_mat <- function(A) {
+  A[lower.tri(A)] <- t(A)[lower.tri(t(A))]
+  diag(A) <- 0
+
+  return(A)
 }
