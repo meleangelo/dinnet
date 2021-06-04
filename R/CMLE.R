@@ -1,3 +1,31 @@
+#' Estimate \eqn{\gamma} by CMLE
+#'
+#' @param A (n-by-n-by-T array) time series of the adjacency matrices
+#' @param gamma_init initial value of gamma
+#'
+#' @return \eqn{\hat{gamma}}
+#'
+#' @export
+#'
+
+CMLE_est <- function(A, gamma_init = NULL, xtol = 1.0e-5) {
+
+  if (is.null(gamma_init)) gamma_init <- 0.5
+
+  opts <- list("algorithm" = "NLOPT_LD_LBFGS",
+               "xtol_rel" = xtol)
+
+  opt_fit <- nloptr::nloptr(x0 = gamma_init,
+                            eval_f = loglike_CMLE,
+                            eval_grad_f = deriv_loglike_CMLE,
+                            lb = -1,
+                            ub = 1,
+                            opts = opts,
+                            A = A)
+
+  return(opt_fit$solution)
+}
+
 #' Log likelihood function for the conditional maximum likelihood estimation
 #'
 #' @param gamma The autoregressive parameter
@@ -14,7 +42,7 @@ loglike_CMLE <- function(gamma, A) {
   TT2 <- TT - 2
   TT1 <- TT - 1
 
-  # Intialize the log-likelihood
+  # Initialize the log-likelihood
   loglik <- 0
 
   for (t in 2:TT2) {
@@ -40,9 +68,6 @@ loglike_CMLE <- function(gamma, A) {
   }
   return(-loglik)
 }
-
-
-
 
 #' Derivative of the Log likelihood function for the conditional
 #' maximum likelihood estimation
@@ -86,30 +111,4 @@ deriv_loglike_CMLE <- function(gamma, A) {
   return(-deriv_loglik)
 }
 
-#' Estimate \eqn{\gamma} by CMLE
-#'
-#' @param A (n-by-n-by-T array) time series of the adjacency matrices
-#' @param gamma_init initial value of gamma
-#'
-#' @return \eqn{\hat{gamma}}
-#'
-#' @export
-#'
 
-CMLE_est <- function(A, gamma_init = NULL) {
-
-  if(is.null(gamma_init)) gamma_init <- 0.5
-
-  opts <- list("algorithm" = "NLOPT_LD_LBFGS",
-               "xtol_rel" = 1.0e-5)
-
-  opt_fit <- nloptr::nloptr(x0 = gamma_init,
-                            eval_f = loglike_CMLE,
-                            eval_grad_f = deriv_loglike_CMLE,
-                            lb = -1,
-                            ub = 1,
-                            opts = opts,
-                            A = A)
-
-  return(opt_fit$solution)
-}

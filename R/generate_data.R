@@ -63,10 +63,11 @@ generate_latent_posSBM <- function(latent, d, block_size){
 #'
 #' @export
 
-generate_data <- function(latent_positions, gamma, time_periods, sim){
+generate_data <- function(latent_positions, gamma, time_periods, sim = NULL){
 
   # Set the random seeds for the DGP
-  set.seed(sim)
+  if (!is.null(sim)) set.seed(sim)
+
   # read number of nodes
   n <- nrow(latent_positions)
 
@@ -77,7 +78,7 @@ generate_data <- function(latent_positions, gamma, time_periods, sim){
   P0 <- sigmoid(alpha) / (1 - sigmoid(gamma + alpha) + sigmoid(alpha))
 
   # generate initial adjacency A_0
-  A0 <- sym_mat(
+  A0 <- sym_mat_0(
     1 * (matrix(runif(n^2), ncol = n, nrow = n) < P0)
   )
 
@@ -86,14 +87,14 @@ generate_data <- function(latent_positions, gamma, time_periods, sim){
   A <- array(NA, dim = c(n, n, time_periods))
 
   P[, , 1] <- sigmoid(gamma * A0 + alpha)
-  A[, , 1] <- sym_mat(
+  A[, , 1] <- sym_mat_0(
     1 * (matrix(runif(n ^ 2), ncol = n, nrow = n) < P[, , 1])
   )
 
   for (t in 2:time_periods) {
     t1 <- t - 1
     P[, , t] <- sigmoid(gamma * A[, , t1] + alpha)
-    A[, , t] <- sym_mat(
+    A[, , t] <- sym_mat_0(
       1 * (matrix(runif(n ^ 2), ncol = n, nrow = n) < P[, , t])
     )
   }
@@ -104,17 +105,3 @@ generate_data <- function(latent_positions, gamma, time_periods, sim){
 }
 
 
-#' Convert a matrix to a symmetric matrix
-#'
-#' Assign the upper triangular matrix to the lower triangle and let diagonal = 0
-#'
-#' @param A a square matrix
-#'
-#' @return `A_sym`
-#'
-sym_mat <- function(A) {
-  A[lower.tri(A)] <- t(A)[lower.tri(t(A))]
-  diag(A) <- 0
-
-  return(A)
-}

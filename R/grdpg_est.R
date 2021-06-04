@@ -11,10 +11,11 @@
 #'
 #' @export
 
-estimate_ASE <- function(A_t, d, sim){
-  set.seed(sim)
+estimate_ASE <- function(A_t, d, sim = NULL){
+  # Set the random seeds for the DGP
+  if (!is.null(sim)) set.seed(sim)
   # estimation of P_t
-  ASE <- grdpg::SpectralEmbedding(A_t, d, work  = 100)
+  ASE <- grdpg::SpectralEmbedding(A_t, d)
   Ipq <- grdpg::getIpq(A_t, d)
   Xhat <- ASE$X %*% sqrt(diag(ASE$D, ncol = d, nrow = d))
   Phat <- Xhat %*% Ipq %*% t(Xhat)
@@ -27,20 +28,20 @@ estimate_ASE <- function(A_t, d, sim){
 #'
 #' @section Warning: random seeds changed
 #'
-#' @inheritParams estimate_ASE
+#' @param A (n-by-n-by-T array) time series of the adjacency matrices
+#' @param d dimension of the latent position
+#' @param sim The random seed
 #'
 #' @return estimated P array for all time periods
 #'
 #' @export
 
-estimate_GRDPG <- function(A, d, sim){
-
-  set.seed(sim)
+estimate_GRDPG <- function(A, d, sim = NULL){
 
   n <- dim(A)[1]
   TT <- dim(A)[3]
   Phat <- array(NA, dim = c(n,n,TT))
-  for (t in 1:TT){
+  for (t in 1:TT) {
     Phat[, , t] <- estimate_ASE(A[, , t], d, sim)
   }
   return(Phat)
