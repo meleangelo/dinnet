@@ -4,7 +4,7 @@
 \alias{CMLE_est}
 \title{Estimate \eqn{\gamma} by CMLE}
 \usage{
-CMLE_est(A, gamma_init = NULL)
+CMLE_est(A, gamma_init = NULL, xtol = 1e-05)
 }
 \arguments{
 \item{A}{(n-by-n-by-T array) time series of the adjacency matrices}

@@ -4,7 +4,7 @@
 \alias{generate_data}
 \title{Function to generate the network time series}
 \usage{
-generate_data(latent_positions, gamma, time_periods, sim)
+generate_data(latent_positions, gamma, time_periods, sim = NULL)
 }
 \arguments{
 \item{latent_positions}{(n-by-d Matrix) The alpha matrix}
