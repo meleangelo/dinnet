@@ -2,6 +2,7 @@
 #'
 #' @inheritParams min_dist_omega
 #' @param d dimension of the latent position
+#' @param est_method estimation method of \eqn{\Omega} matrix. "avg" (direct estimation) or "opt" (via minimum distance)
 #'
 #' @return A list containing the following:
 #' \describe{
@@ -11,15 +12,44 @@
 #'
 #' @export
 #'
-alpha_est <- function(P_hat, A, gamma_hat, d, Omega_init = NULL, xtol = 1.0e-5) {
+alpha_est <- function(P_hat, A, gamma_hat, d, est_method = "avg", Omega_init = NULL, xtol = 1.0e-5) {
 
-  Omega_hat <- min_dist_omega(P_hat, A, gamma_hat, Omega_init, xtol)
+  if (est_method == "avg") {
+    Omega_hat <- avg_omega(P_hat, A, gamma_hat)
+  } else if (est_method == "opt") {
+    Omega_hat <- min_dist_omega(P_hat, A, gamma_hat, Omega_init, xtol)
+  } else {
+    stop("Invalid method input.")
+  }
+
   svd_res <- grdpg::SpectralEmbedding(Omega_hat, d)
 
   if (length(svd_res$D) > 1) alpha_hat <- svd_res$X %*% sqrt(diag(svd_res$D))
   else alpha_hat <- svd_res$X * sqrt(svd_res$D)
   return(list(alpha_hat = alpha_hat,
               Omega_hat = Omega_hat))
+}
+
+#' Estimation of \eqn{\hat{\Omega}} by averaging
+#'
+#' @param P_hat (n-by-n-by-T array) Estimated time series of the transition probability matrix
+#' @param A (n-by-n-by-T array) time series of the adjacency matrices
+#' @param gamma_hat The estimated autoregressive parameter
+#'
+#' @return \eqn{\Omega} matrix
+#'
+#' @export
+#'
+#'
+avg_omega <- function(P_hat, A, gamma_hat) {
+  TT <- dim(A)[3]
+
+  P_temp <- P_hat[, , 2:TT]
+  A_temp <- A[, , 1:(TT - 1)]
+
+  Omega <- apply(log(P_temp / (1 - P_temp)) - gamma_hat * A_temp, c(1,2), mean)
+
+  return(Omega)
 }
 
 
@@ -31,7 +61,7 @@ alpha_est <- function(P_hat, A, gamma_hat, d, Omega_init = NULL, xtol = 1.0e-5) 
 #' @param Omega_init = NUll by default: initial value
 #' @param xtol = 1.0e-5 by default: numerical accuracy
 #'
-#' @return \eqn{\Omega}
+#' @return \eqn{\Omega} matrix
 #'
 #' @export
 min_dist_omega <- function(P_hat, A, gamma_hat, Omega_init = NULL, xtol = 1.0e-5) {

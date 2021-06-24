@@ -2,7 +2,7 @@
 #
 # # parallel montecarlo
 # nsim <- 20 #1000
-# n <- 200
+# n <- 2000
 # TT <- 5
 # K <- 2
 # d <- 1
@@ -31,14 +31,14 @@
 # #
 # # (y = apply(M, c(1,2),incrementByN))
 #
-#
+# #
 # gamma_hat <- CMLE_est(A)
 # P_hat <- estimate_GRDPG(A, d, sim = 100)
-# Omega_init <- latent_positions %*% t(latent_positions)
-# xtol = 1e-5
-#
-#
-# alpha_hat <- alpha_est(P_hat, A, gamma_hat, d, Omega_init)$alpha_hat
-# alpha_hat_stat <- alpha_est_stat(data_list$A0, gamma_hat, d, lb = -10, ub = 10)
-#
+# # Omega_init <- latent_positions %*% t(latent_positions)
+# # xtol = 1e-5
+# #
+# #
+# alpha_hat <- alpha_est(P_hat, A, gamma_hat, d, est_method = "avg")$alpha_hat
+# # alpha_hat_stat <- alpha_est_stat(data_list$A0, gamma_hat, d, lb = -10, ub = 10)
+# #
 #
