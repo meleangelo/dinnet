@@ -4,7 +4,15 @@
 \alias{alpha_est}
 \title{Estimate \eqn{\alpha} from \eqn{\hat{\Omega}}}
 \usage{
-alpha_est(P_hat, A, gamma_hat, d, Omega_init = NULL, xtol = 1e-05)
+alpha_est(
+  P_hat,
+  A,
+  gamma_hat,
+  d,
+  est_method = "avg",
+  Omega_init = NULL,
+  xtol = 1e-05
+)
 }
 \arguments{
 \item{P_hat}{(n-by-n-by-T array) Estimated time series of the transition probability matrix}
@@ -14,6 +22,8 @@ alpha_est(P_hat, A, gamma_hat, d, Omega_init = NULL, xtol = 1e-05)
 \item{gamma_hat}{The estimated autoregressive parameter}
 
 \item{d}{dimension of the latent position}
+
+\item{est_method}{estimation method of \eqn{\Omega} matrix. "avg" (direct estimation) or "opt" (via minimum distance)}
 
 \item{Omega_init}{= NUll by default: initial value}
 
