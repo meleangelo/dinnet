@@ -4,7 +4,7 @@
 \alias{estimate_GRDPG}
 \title{Function for estimation of P with GRDPG}
 \usage{
-estimate_GRDPG(A, d, sim = NULL)
+estimate_GRDPG(A, d, sim = NULL, bfcheck = TRUE, l = 1e-04, u = 0.9999)
 }
 \arguments{
 \item{A}{(n-by-n-by-T array) time series of the adjacency matrices}
@@ -12,6 +12,12 @@ estimate_GRDPG(A, d, sim = NULL)
 \item{d}{dimension of the latent position}
 
 \item{sim}{The random seed}
+
+\item{bfcheck}{Check whether all entries of the estimated probabiltiy matrix are between 0 and 1}
+
+\item{l}{Lower bound of the probability matrix, i.e. set all entries that not greater than 0 to `l`. 0.0001 by default}
+
+\item{u}{Upper bound of the probability matrix, i.e. set all entries that not less than 1 to be `u`. 0.9999 by default.}
 }
 \value{
 estimated P array for all time periods
