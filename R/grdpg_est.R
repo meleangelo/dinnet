@@ -6,12 +6,15 @@
 #' @param A_t (n-by-n) Adjacency matrix
 #' @param d dimension of the latent position
 #' @param sim The random seed
+#' @param bfcheck Check whether all entries of the estimated probabiltiy matrix are between 0 and 1
+#' @param l Lower bound of the probability matrix, i.e. set all entries that not greater than 0 to `l`. 0.0001 by default
+#' @param u Upper bound of the probability matrix, i.e. set all entries that not less than 1 to be `u`. 0.9999 by default.
 #'
 #' @return estimated P
 #'
 #' @export
 
-estimate_ASE <- function(A_t, d, sim = NULL){
+estimate_ASE <- function(A_t, d, sim = NULL, bfcheck = TRUE, l = 0.0001, u = 0.9999){
   # Set the random seeds for the DGP
   if (!is.null(sim)) set.seed(sim)
   # estimation of P_t
@@ -19,7 +22,9 @@ estimate_ASE <- function(A_t, d, sim = NULL){
   Ipq <- grdpg::getIpq(A_t, d)
   Xhat <- ASE$X %*% sqrt(diag(ASE$D, ncol = d, nrow = d))
   Phat <- Xhat %*% Ipq %*% t(Xhat)
-  return(Phat)
+
+  if (bfcheck) return(grdpg::BFcheck(Phat, l = l, u = u))
+  else return(Phat)
 }
 
 #' Function for estimation of X with ASE
@@ -51,18 +56,21 @@ estimateX_ASE <- function(A, d, sim = NULL){
 #' @param A (n-by-n-by-T array) time series of the adjacency matrices
 #' @param d dimension of the latent position
 #' @param sim The random seed
+#' @param bfcheck Check whether all entries of the estimated probabiltiy matrix are between 0 and 1
+#' @param l Lower bound of the probability matrix, i.e. set all entries that not greater than 0 to `l`. 0.0001 by default
+#' @param u Upper bound of the probability matrix, i.e. set all entries that not less than 1 to be `u`. 0.9999 by default.
 #'
 #' @return estimated P array for all time periods
 #'
 #' @export
 
-estimate_GRDPG <- function(A, d, sim = NULL){
+estimate_GRDPG <- function(A, d, sim = NULL, bfcheck = TRUE, l = 0.0001, u = 0.9999){
 
   n <- dim(A)[1]
   TT <- dim(A)[3]
   Phat <- array(NA, dim = c(n,n,TT))
   for (t in 1:TT) {
-    Phat[, , t] <- estimate_ASE(A[, , t], d, sim)
+    Phat[, , t] <- estimate_ASE(A[, , t], d, sim, bfcheck, l, u)
   }
   return(Phat)
 }
