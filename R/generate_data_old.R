@@ -63,7 +63,7 @@ generate_latent_posSBM <- function(latent, d, block_size){
 #'
 #' @export
 
-generate_data <- function(latent_positions, gamma, time_periods, sim = NULL){
+generate_data_old <- function(latent_positions, gamma, time_periods, sim = NULL){
 
   # Set the random seeds for the DGP
   if (!is.null(sim)) set.seed(sim)
@@ -83,18 +83,20 @@ generate_data <- function(latent_positions, gamma, time_periods, sim = NULL){
   )
 
   # initialize P and A
-  P <- vector("list", length = time_periods)
-  A <- vector("list", length = time_periods)
+  P <- array(NA, dim = c(n, n, time_periods))
+  A <- array(NA, dim = c(n, n, time_periods))
 
-  P[[1]] <- sigmoid(gamma * A0 + alpha)
-  A[[1]] <- Matrix::Matrix( 1* (matrix(runif(n ^ 2), ncol = n, nrow = n) < P[[1]] ), sparse = TRUE)
-
+  P[, , 1] <- sigmoid(gamma * A0 + alpha)
+  A[, , 1] <- sym_mat_0(
+    1 * (matrix(runif(n ^ 2), ncol = n, nrow = n) < P[, , 1])
+  )
 
   for (t in 2:time_periods) {
     t1 <- t - 1
-    P[[t]] <- sigmoid(gamma * A[[t1]] + alpha)
-    A[[t]] <- Matrix::Matrix( 1* (matrix(runif(n ^ 2), ncol = n, nrow = n) < P[[t1]] ), sparse = TRUE)
-
+    P[, , t] <- sigmoid(gamma * A[, , t1] + alpha)
+    A[, , t] <- sym_mat_0(
+      1 * (matrix(runif(n ^ 2), ncol = n, nrow = n) < P[, , t])
+    )
   }
 
   data <- list(A0, P0, A, P, alpha)
