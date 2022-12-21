@@ -87,13 +87,14 @@ generate_data <- function(latent_positions, gamma, time_periods, sim = NULL){
   A <- vector("list", length = time_periods)
 
   P[[1]] <- sigmoid(gamma * A0 + alpha)
-  A[[1]] <- Matrix::Matrix( 1* (matrix(runif(n ^ 2), ncol = n, nrow = n) < P[[1]] ), sparse = TRUE)
+  A[[1]] <- Matrix::Matrix( sym_mat_0(1* (matrix(runif(n ^ 2), ncol = n, nrow = n) < P[[1]] )), sparse = TRUE)
+
 
 
   for (t in 2:time_periods) {
     t1 <- t - 1
     P[[t]] <- sigmoid(gamma * A[[t1]] + alpha)
-    A[[t]] <- Matrix::Matrix( 1* (matrix(runif(n ^ 2), ncol = n, nrow = n) < P[[t1]] ), sparse = TRUE)
+    A[[t]] <- Matrix::Matrix( sym_mat_0(1* (matrix(runif(n ^ 2), ncol = n, nrow = n) < P[[t]] )), sparse = TRUE)
 
   }
 
