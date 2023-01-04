@@ -11,7 +11,7 @@
 #'
 #' @export
 
-estimate_ASE <- function(A_t, d, sim = NULL){
+estimate_ASE_old <- function(A_t, d, sim = NULL){
   # Set the random seeds for the DGP
   if (!is.null(sim)) set.seed(sim)
   # estimation of P_t
@@ -34,7 +34,7 @@ estimate_ASE <- function(A_t, d, sim = NULL){
 #' @return estimated X_hat
 #'
 #' @export
-estimateX_ASE <- function(A, d, sim = NULL){
+estimateX_ASE_old <- function(A, d, sim = NULL){
   # Set the random seeds for the DGP
   if (!is.null(sim)) set.seed(sim)
   # estimation of P_t
@@ -56,14 +56,13 @@ estimateX_ASE <- function(A, d, sim = NULL){
 #'
 #' @export
 
-estimate_GRDPG <- function(A, d, sim = NULL){
+estimate_GRDPG_old <- function(A, d, sim = NULL){
 
-  # read in dimensions
-  n <- dim(A[[1]])[1]
-  TT <- length(A)
-  Phat <- vector("list", length = TT)
+  n <- dim(A)[1]
+  TT <- dim(A)[3]
+  Phat <- array(NA, dim = c(n,n,TT))
   for (t in 1:TT) {
-    Phat[[t]] <- estimate_ASE(A[[t]], d, sim)
+    Phat[, , t] <- estimate_ASE_old(A[, , t], d, sim)
   }
   return(Phat)
 }
