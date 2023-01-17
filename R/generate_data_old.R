@@ -17,7 +17,7 @@
 #'
 #' @export
 #'
-generate_latent_posSBM <- function(latent, d, block_size){
+generate_latent_posSBM_old <- function(latent, d, block_size){
 
   # Check inputs
   if (nrow(latent) != d) {

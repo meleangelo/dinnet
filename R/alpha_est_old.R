@@ -12,7 +12,7 @@
 #'
 #' @export
 #'
-alpha_est <- function(P_hat, A, gamma_hat, d, est_method = "avg", Omega_init = NULL, xtol = 1.0e-5) {
+alpha_est_old <- function(P_hat, A, gamma_hat, d, est_method = "avg", Omega_init = NULL, xtol = 1.0e-5) {
 
   if (est_method == "avg") {
     Omega_hat <- avg_omega(P_hat, A, gamma_hat)
@@ -41,7 +41,7 @@ alpha_est <- function(P_hat, A, gamma_hat, d, est_method = "avg", Omega_init = N
 #' @export
 #'
 #'
-avg_omega <- function(P_hat, A, gamma_hat) {
+avg_omega_old <- function(P_hat, A, gamma_hat) {
   TT <- dim(A)[3]
 
   P_temp <- P_hat[, , 2:TT]
@@ -64,7 +64,7 @@ avg_omega <- function(P_hat, A, gamma_hat) {
 #' @return \eqn{\Omega} matrix
 #'
 #' @export
-min_dist_omega <- function(P_hat, A, gamma_hat, Omega_init = NULL, xtol = 1.0e-5) {
+min_dist_omega_old <- function(P_hat, A, gamma_hat, Omega_init = NULL, xtol = 1.0e-5) {
   # do the minimization entry-by-entry
 
   n <- dim(A)[1]
@@ -107,7 +107,7 @@ min_dist_omega <- function(P_hat, A, gamma_hat, Omega_init = NULL, xtol = 1.0e-5
 #' @return distance_ij
 #'
 #'
-dist_ij <- function(omega, p, a, gamma) {
+dist_ij_old <- function(omega, p, a, gamma) {
   TT <- length(p)
   sum((p[2:TT] - sigmoid(gamma * a[1:(TT - 1)] + omega))^2) / (TT - 1)
 }
@@ -122,7 +122,7 @@ dist_ij <- function(omega, p, a, gamma) {
 #' @return distance_ij
 #'
 #'
-deriv_dist_ij <- function(omega, p, a, gamma) {
+deriv_dist_ij_old <- function(omega, p, a, gamma) {
   TT <- length(p)
   x <- gamma * a[1:(TT - 1)] + omega
   p <- p[2:TT]
