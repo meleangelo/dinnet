@@ -15,10 +15,10 @@
 alpha_est <- function(A, gamma_hat, d, Omega_init = NULL, xtol = 1.0e-5) {
 
   TT <- length(A)
-  Omega_hat <- matrix(NA, nrow = n, ncol = n)
+  Omega_hat <- matrix(0, nrow = n, ncol = n)
   for (t in 2:TT){
-    #P_hat <- estimate_ASE(A[[t]], d, sim = 100)
-    #Omega_hat <- Omega_hat + ( log(P_hat / (1 - P_hat)) - gamma_hat * A[[t-1]] )/(TT-1)
+    P_hat <- estimate_ASE(A[[t]], d, sim = 100)
+    Omega_hat <- Omega_hat + ( log(P_hat / (1 - P_hat)) - gamma_hat * A[[t-1]] )/(TT-1)
 
   }
 
