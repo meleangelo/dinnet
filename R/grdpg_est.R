@@ -18,7 +18,7 @@ estimate_ASE <- function(A_t, d, sim = NULL){
   ASE <- grdpg::SpectralEmbedding(A_t, d)
   Ipq <- grdpg::getIpq(A_t, d)
   Xhat <- ASE$X %*% sqrt(diag(ASE$D, ncol = d, nrow = d))
-  Phat <- Xhat %*% Ipq %*% t(Xhat)
+  Phat <- grdpg::BFcheck(Xhat %*% Ipq %*% t(Xhat))
   return(Phat)
 }
 
