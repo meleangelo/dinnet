@@ -8,7 +8,7 @@
 #' @export
 #'
 
-CMLE_est <- function(A, gamma_init = NULL, xtol = 1.0e-5) {
+CMLE_est_old <- function(A, gamma_init = NULL, xtol = 1.0e-5) {
 
   if (is.null(gamma_init)) gamma_init <- 0.5
 
@@ -16,8 +16,8 @@ CMLE_est <- function(A, gamma_init = NULL, xtol = 1.0e-5) {
                "xtol_rel" = xtol)
 
   opt_fit <- nloptr::nloptr(x0 = gamma_init,
-                            eval_f = loglike_CMLE,
-                            eval_grad_f = deriv_loglike_CMLE,
+                            eval_f = loglike_CMLE_old,
+                            eval_grad_f = deriv_loglike_CMLE_old,
                             lb = -1,
                             ub = 1,
                             opts = opts,
@@ -29,16 +29,16 @@ CMLE_est <- function(A, gamma_init = NULL, xtol = 1.0e-5) {
 #' Log likelihood function for the conditional maximum likelihood estimation
 #'
 #' @param gamma The autoregressive parameter
-#' @param A (list of length T, containing n-by-n sparse adjacency matrices) time series of the adjacency matrices
+#' @param A (n-by-n-by-T array) time series of the adjacency matrices
 #'
 #' @return log-likelihood (times -1)
 #'
 
-loglike_CMLE <- function(gamma, A) {
+loglike_CMLE_old <- function(gamma, A) {
 
   # read in dimensions
-  n <- dim(A[[1]])[1]
-  TT <- length(A)
+  n <- dim(A)[1]
+  TT <- dim(A)[3]
   TT2 <- TT - 2
   TT1 <- TT - 1
 
@@ -50,16 +50,16 @@ loglike_CMLE <- function(gamma, A) {
 
       # compute the common factor in both numerator and denominator
       if (s - t <= 2) {
-        phi <- gamma * (A[[t - 1]] - A[[s + 1]])
+        phi <- gamma * (A[, , (t - 1)] - A[, , (s + 1)])
       } else {
-        phi <- gamma * (A[[t - 1]] - A[[s + 1]] +
-                        A[[t + 1]] - A[[s - 1]])
+        phi <- gamma * (A[, , (t - 1)] - A[, , (s + 1)] +
+                          A[, , (t + 1)] - A[, , (s - 1)])
       }
 
       # Compute the likelihood contribution for the (s,t) pair
       loglik_t <- 0.5 * sum(
-        (A[[t]] + A[[s]] == 1) * (
-          (A[[t]] * phi) - log(1 + exp(phi))
+        (A[, , t] + A[, , s] == 1) * (
+          (A[, , t] * phi) - log(1 + exp(phi))
         )
       ) / (n^2)
 
@@ -78,11 +78,11 @@ loglike_CMLE <- function(gamma, A) {
 #'
 #' @return derivative of the log-likelihood (times -1)
 
-deriv_loglike_CMLE <- function(gamma, A) {
+deriv_loglike_CMLE_old <- function(gamma, A) {
 
   # read in dimensions
-  n <- dim(A[[1]])[1]
-  TT <- length(A)
+  n <- dim(A)[1]
+  TT <- dim(A)[3]
   TT2 <- TT - 2
   TT1 <- TT - 1
 
@@ -93,16 +93,16 @@ deriv_loglike_CMLE <- function(gamma, A) {
     for (s in (t + 1):TT1) {
 
       if (s - t <= 2) {
-        deriv_phi <- A[[t - 1]] - A[[s + 1]]
+        deriv_phi <- A[, , (t - 1)] - A[, , (s + 1)]
 
       } else {
-        deriv_phi <- A[[t - 1]] - A[[s + 1]] + A[[t + 1]] - A[[s - 1]]
+        deriv_phi <- A[, , (t - 1)] - A[, , (s + 1)] + A[, , (t + 1)] - A[, , (s - 1)]
       }
       phi <- gamma * deriv_phi
 
       # Compute the derivative of the likelihood contribution for the (s,t) pair
       deriv_loglik_t <- 0.5 * sum(
-        (A[[t]] + A[[s]] == 1) * (A[[t]] - sigmoid(phi)) * deriv_phi
+        (A[, , t] + A[, , s] == 1) * (A[, , t] - sigmoid(phi)) * deriv_phi
       ) / (n^2)
 
       deriv_loglik <- deriv_loglik + deriv_loglik_t
