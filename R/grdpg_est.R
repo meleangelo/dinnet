@@ -61,14 +61,14 @@ estimateX_ASE <- function(A, d, sim = NULL){
 #'
 #' @export
 
-estimate_GRDPG <- function(A, d, sim = NULL){
+estimate_GRDPG <- function(A, d, sim = NULL, bfcheck = TRUE, l = 0.0001, u = 0.9999){
 
   # read in dimensions
   n <- dim(A[[1]])[1]
   TT <- length(A)
   Phat <- vector("list", length = TT)
   for (t in 1:TT) {
-    Phat[[t]] <- estimate_ASE(A[[t]], d, sim)
+    Phat[[t]] <- estimate_ASE(A[[t]], d, sim, bfcheck, l, u)
   }
   return(Phat)
 }
