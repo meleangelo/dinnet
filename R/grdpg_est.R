@@ -11,15 +11,20 @@
 #'
 #' @export
 
-estimate_ASE <- function(A_t, d, sim = NULL){
+estimate_ASE <- function(A_t, d, sim = NULL, bfcheck = TRUE, l = 0.0001, u = 0.9999){
   # Set the random seeds for the DGP
   if (!is.null(sim)) set.seed(sim)
   # estimation of P_t
   ASE <- grdpg::SpectralEmbedding(A_t, d)
   Ipq <- grdpg::getIpq(A_t, d)
   Xhat <- ASE$X %*% sqrt(diag(ASE$D, ncol = d, nrow = d))
-  Phat <- grdpg::BFcheck(Xhat %*% Ipq %*% t(Xhat))
-  return(Phat)
+  Phat <- Xhat %*% Ipq %*% t(Xhat)
+
+  if (bfcheck){
+    return(grdpg::BFcheck(Phat, l = l, u = u))
+  }  else {
+    return(Phat)
+  }
 }
 
 #' Function for estimation of X with ASE
