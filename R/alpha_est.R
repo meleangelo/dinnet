@@ -26,8 +26,12 @@ alpha_est <- function(A, gamma_hat, d, Omega_init = NULL, xtol = 1.0e-5) {
 
   svd_res <- grdpg::SpectralEmbedding(Omega_hat, d)
 
-  if (length(svd_res$D) > 1) alpha_hat <- svd_res$X %*% sqrt(diag(svd_res$D))
-  else alpha_hat <- svd_res$X * sqrt(svd_res$D)
+  if (length(svd_res$D) > 1){
+    alpha_hat <- svd_res$X %*% sqrt(diag(svd_res$D))
+  }
+  else {
+    alpha_hat <- svd_res$X * sqrt(svd_res$D)
+  }
   return(list(alpha_hat = alpha_hat,
               Omega_hat = Omega_hat))
 }
