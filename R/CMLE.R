@@ -12,7 +12,7 @@ CMLE_est <- function(A, gamma_init = NULL, xtol = 1.0e-5) {
 
   if (is.null(gamma_init)) gamma_init <- 0.5
 
-  opts <- list("algorithm" = "NLOPT_LD_LBFGS",
+  opts <- list("algorithm" =  "NLOPT_LD_LBFGS", #"NLOPT_LN_COBYLA",
                "xtol_rel" = xtol)
 
   opt_fit <- nloptr::nloptr(x0 = gamma_init,
@@ -56,12 +56,31 @@ loglike_CMLE <- function(gamma, A) {
                         A[[t + 1]] - A[[s - 1]])
       }
 
+
+
       # Compute the likelihood contribution for the (s,t) pair
-      loglik_t <- 0.5 * sum(
-        (A[[t]] + A[[s]] == 1) * (
-          (A[[t]] * phi) - log(1 + exp(phi))
-        )
-      ) / (n^2)
+      used_links = Matrix::Matrix((A[[t]] + A[[s]] == 1), sparse=TRUE)
+      #loglik_t <- 0.5 * sum(
+      # (A[[t]] + A[[s]] == 1) * (
+      #   (A[[t]] * phi) - log(1 + exp(phi))
+      # )
+      #) / (n^2)
+
+      loglik_t <- 0.5 * sum( used_links * (A[[t]] * phi) ) / (n^2)
+
+      # compute log(1+exp(phi)) in a smart way to avoid memory problems
+      temp_matrix = Matrix::Matrix(phi[used_links ], sparse = TRUE)
+      logsum = 0.5 *sum(log(1+exp(temp_matrix)))  / (n^2)
+
+      loglik_t = loglik_t - logsum
+
+      #phi_values = unique(as.vector(phi))
+      #compute_sparse = 0
+      #for (p in 1:length(phi_values)){
+      #  compute_sparse = compute_sparse + 0.5 * sum(phi == phi_values[p])*log( 1 + exp(phi_values[p]))/(n^2)
+      #}
+
+      #loglik_t = loglik_t - compute_sparse
 
       loglik <- loglik + loglik_t
     }
@@ -101,9 +120,17 @@ deriv_loglike_CMLE <- function(gamma, A) {
       phi <- gamma * deriv_phi
 
       # Compute the derivative of the likelihood contribution for the (s,t) pair
-      deriv_loglik_t <- 0.5 * sum(
-        (A[[t]] + A[[s]] == 1) * (A[[t]] - sigmoid(phi)) * deriv_phi
-      ) / (n^2)
+      # deriv_loglik_t <- 0.5 * sum(
+      #   (A[[t]] + A[[s]] == 1) * (A[[t]] - sigmoid(phi)) * deriv_phi
+      # ) / (n^2)
+
+      used_links = Matrix::Matrix((A[[t]] + A[[s]] == 1), sparse=TRUE)
+      deriv_loglik_t = 0.5 * sum(used_links * A[[t]] * deriv_phi) / (n^2) # first part
+      phi_sparse = Matrix::Matrix(phi[used_links ], sparse = TRUE)
+      deriv_phi_sparse = Matrix::Matrix(deriv_phi[used_links ], sparse = TRUE)
+      second_part = 0.5 *sum( sigmoid(phi_sparse) * deriv_phi_sparse )  / (n^2)
+      deriv_loglik_t = deriv_loglik_t - second_part
+
 
       deriv_loglik <- deriv_loglik + deriv_loglik_t
     }
