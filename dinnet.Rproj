@@ -17,5 +17,5 @@ StripTrailingWhitespace: Yes
 
 BuildType: Package
 PackageUseDevtools: Yes
-PackagePath: /Users/amele1/Dropbox/network_dynamics/codes/dinnet
+PackagePath: /Users/Angelo_1/Dropbox/network_dynamics/codes/dinnet
 PackageInstallArgs: --no-multiarch --with-keep.source
