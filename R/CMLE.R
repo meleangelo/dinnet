@@ -2,13 +2,15 @@
 #'
 #' @param A (n-by-n-by-T array) time series of the adjacency matrices
 #' @param gamma_init initial value of gamma
+#' @param lb lower bound for gamma
+#' @param ub upper bound for gamma
 #'
 #' @return \eqn{\hat{gamma}}
 #'
 #' @export
 #'
 
-CMLE_est <- function(A, gamma_init = NULL, xtol = 1.0e-5) {
+CMLE_est <- function(A, gamma_init = NULL, xtol = 1.0e-5, lb = -1, ub = 1) {
 
   if (is.null(gamma_init)) gamma_init <- 0.5
 
@@ -18,8 +20,8 @@ CMLE_est <- function(A, gamma_init = NULL, xtol = 1.0e-5) {
   opt_fit <- nloptr::nloptr(x0 = gamma_init,
                             eval_f = loglike_CMLE,
                             eval_grad_f = deriv_loglike_CMLE,
-                            lb = -1,
-                            ub = 1,
+                            lb = lb,
+                            ub = ub,
                             opts = opts,
                             A = A)
 
