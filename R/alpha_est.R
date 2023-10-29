@@ -1,38 +1,24 @@
 #' Estimate \eqn{\alpha} from \eqn{\hat{\Omega}}
 #'
-#' @inheritParams min_dist_omega
+#' @param Omega_hat matrix of fixed effects
 #' @param d dimension of the latent position
-#' @param est_method estimation method of \eqn{\Omega} matrix. "avg" (direct estimation) or "opt" (via minimum distance)
 #'
-#' @return A list containing the following:
+#' @return A matrix
 #' \describe{
-#' \item{`alpha_est`}{(n-by-d matrix) Estimated latent positions}
-#' \item{`Omega_hat`}{(n-by-n matrix) Estimated \eqn{\Omega} matrix}
+#' \item{`alpha_hat`}{(n-by-d matrix) Estimated latent positions}
 #' }
 #'
 #' @export
 #'
-alpha_est <- function(A, gamma_hat, d, Omega_init = NULL, xtol = 1.0e-5) {
+alpha_est <- function(Omega_hat, d) {
 
-  TT <- length(A)
-  Omega_hat <- matrix(0, nrow = n, ncol = n)
-  for (t in 2:TT){
-    P_hat <- estimate_ASE(A[[t]], d, sim = 100)
-    Omega_hat <- Omega_hat + ( log(P_hat / (1 - P_hat)) - gamma_hat * A[[t-1]] )/(TT-1)
+  tsvd <- irlba(Omega_hat, d)
 
-  }
-
-
-
-  svd_res <- grdpg::SpectralEmbedding(Omega_hat, d)
-
-  if (length(svd_res$D) > 1){
-    alpha_hat <- svd_res$X %*% sqrt(diag(svd_res$D))
-  }
-  else {
-    alpha_hat <- svd_res$X * sqrt(svd_res$D)
-  }
-  return(list(alpha_hat = alpha_hat,
-              Omega_hat = Omega_hat))
+    if (length(tsvd$d) > 1){
+      alpha_hat <- tsvd$u %*% sqrt(diag(tsvd$d, ncol = d, nrow = d))
+    }
+    else {
+      alpha_hat <- tsvd$u * sqrt(tsvd$d)
+    }
+    return(alpha_hat)
 }
-
